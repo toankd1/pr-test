@@ -1,0 +1,17 @@
+env: dev
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/tn_core?serverTimezone=GMT%2B7&createDatabaseIfNotExist=true&useUnicode=yes&characterEncoding=UTF-8
+    username: root
+    password: 123456
+  elasticsearch:
+    host: localhost
+    port: 9200
+  liquibase:
+    change-log: classpath:db/changelog/liquibase-changeLog.xml
+    enabled: true
+  redis:
+    host: redis
+    port: 6379
