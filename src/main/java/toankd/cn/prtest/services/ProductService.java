@@ -15,6 +15,6 @@ public class ProductService {
     private ProductRepository productRepository;
 
     public List<Product> processSearch(String q) {
-        return productRepository.findAll();
+        return productRepository.findByName(q);
     }
 }
