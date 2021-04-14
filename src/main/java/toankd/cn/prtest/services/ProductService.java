@@ -13,13 +13,18 @@ import java.util.*;
 
 @Service
 @Slf4j
-@CacheConfig(cacheNames = "productCache")
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
     @Cacheable(cacheNames = "products")
-    public List<Product> processSearch(String q) {
+    public List<Product> getAll() {
+        // test
+        waitSomeTime();
+        return this.productRepository.findAll();
+    }
+
+    public List<Product> getProductByName(String q) {
         waitSomeTime();
         return this.productRepository.findByName(q);
     }
@@ -29,7 +34,7 @@ public class ProductService {
         return this.productRepository.save(product);
     }
 
-
+    //
     private void waitSomeTime() {
         System.out.println("Long Wait Begin");
         try {

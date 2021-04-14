@@ -9,6 +9,6 @@ import java.util.*;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-    @Query(value = "select * from product where name like %?1%", nativeQuery = true)
+    @Query(value = "select * from product where name like %?1%",nativeQuery = true)
     List<Product> findByName(String name);
 }

@@ -18,15 +18,21 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<Object> getProduct(@RequestParam(value = "q", required = false) String query) {
+    public ResponseEntity<Object> getProduct() {
+        List<Product> products = this.productService.getAll();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/products/name")
+    public ResponseEntity<Object> getProductByName(@RequestParam(value = "q", required = false) String query) {
         log.info("searching by name {}", query);
-        List<Product> products = this.productService.processSearch(query);
+        List<Product> products = this.productService.getProductByName(query);
         log.info("products {}", products);
         return ResponseEntity.ok(products);
     }
 
     @PostMapping(value = "/products")
-    public ResponseEntity<Object> addCustomer(@RequestBody Product product) {
+    public ResponseEntity<Object> addProduct(@RequestBody Product product) {
         Product created = this.productService.add(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

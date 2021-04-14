@@ -1,10 +1,5 @@
 spring:
   profiles:
     active: dev
-  servlet:
-    multipart:
-      max-file-size: 2MB
-messaging:
-  active: true
 server:
   port: 8082
