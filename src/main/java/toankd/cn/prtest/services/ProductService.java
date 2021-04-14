@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import toankd.cn.prtest.entities.Product;
 import toankd.cn.prtest.repositories.ProductRepository;
@@ -24,8 +25,14 @@ public class ProductService {
         return this.productRepository.findAll();
     }
 
-    public List<Product> getProductByName(String q) {
+    @Cacheable(cacheNames = "product", key = "#id", unless = "#result == null")
+    public Product getProductById(int id) {
         waitSomeTime();
+        return this.productRepository.findById(id).orElse(null);
+    }
+
+    // not cache
+    public List<Product> getProductByName(String q) {
         return this.productRepository.findByName(q);
     }
 
@@ -34,7 +41,27 @@ public class ProductService {
         return this.productRepository.save(product);
     }
 
-    //
+    @CacheEvict(cacheNames = "products", allEntries = true)
+    public Product update(Product product) {
+        Optional<Product> optProduct = this.productRepository.findById(product.getId());
+        if (optProduct.isEmpty())
+            return null;
+        Product repProduct = optProduct.get();
+        repProduct.setName(product.getName());
+        repProduct.setPrice(product.getPrice());
+        repProduct.setQuantity(product.getQuantity());
+        repProduct.setCategory(product.getCategory());
+        repProduct.setDescription(product.getDescription());
+        repProduct.setManufacturer(product.getManufacturer());
+        return this.productRepository.save(repProduct);
+    }
+
+    @Caching(evict = {@CacheEvict(cacheNames = "product", key = "#id"),
+            @CacheEvict(cacheNames = "products", allEntries = true)})
+    public void delete(int id) {
+        this.productRepository.deleteById(id);
+    }
+
     private void waitSomeTime() {
         System.out.println("Long Wait Begin");
         try {
