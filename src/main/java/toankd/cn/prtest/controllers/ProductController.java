@@ -23,19 +23,19 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping(value = "/products/{id}")
+    public ResponseEntity<Object> getCustomerById(@PathVariable("id") String id) {
+        int _id = Integer.parseInt(id);
+        Product product = this.productService.getProductById(_id);
+        return ResponseEntity.ok(product);
+    }
+
     @GetMapping(value = "/products/name")
     public ResponseEntity<Object> getProductByName(@RequestParam(value = "q", required = false) String query) {
         log.info("searching by name {}", query);
         List<Product> products = this.productService.getProductByName(query);
         log.info("products {}", products);
         return ResponseEntity.ok(products);
-    }
-
-    @GetMapping(value = "/products/{id}")
-    public ResponseEntity<Object> getCustomerById(@PathVariable("id") String id) {
-        Integer _id = Integer.valueOf(id);
-        Product product = this.productService.getProductById(_id);
-        return ResponseEntity.ok(product);
     }
 
     @PostMapping(value = "/products")
@@ -52,7 +52,7 @@ public class ProductController {
 
     @DeleteMapping(value = "/products/{id}")
     public ResponseEntity<Object> deleteProductById(@PathVariable("id") String id) {
-        Integer _id = Integer.valueOf(id);
+        int _id = Integer.parseInt(id);
         this.productService.delete(_id);
         return ResponseEntity.ok().build();
     }
