@@ -1,22 +1,33 @@
 package toankd.cn.prtest.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import toankd.cn.prtest.elastic.index.ProductIndex;
+import toankd.cn.prtest.elastic.repositories.ProductIndexRepo;
 import toankd.cn.prtest.entities.Product;
 import toankd.cn.prtest.repositories.ProductRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class ProductService {
+
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductIndexRepo productIndexRepo;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Cacheable(cacheNames = "products")
     public List<Product> getAll() {
@@ -70,5 +81,23 @@ public class ProductService {
             e.printStackTrace();
         }
         System.out.println("Long Wait End");
+    }
+
+    public void reimportElastic() {
+        // 1. Query list product from db
+        List<Product> productList = this.productRepository.findAll();
+
+        // 2. Convert to index
+        List<ProductIndex> productDataSet = productList.stream()
+                .map(this::productToProductIndexMapper).collect(Collectors.toList());
+
+        // 3. Import to Elastic
+        productIndexRepo.deleteAll();
+        productIndexRepo.saveAll(productDataSet);
+    }
+
+    private ProductIndex productToProductIndexMapper(final Product product) {
+        ProductIndex productIndex = modelMapper.map(product, ProductIndex.class);
+        return productIndex;
     }
 }
